@@ -5,6 +5,9 @@
 
 #include "ghe_algorithm.h"
 
+#define DRM_MODE_HISTOGRAM_HSV_MAX_RGB			(1 << 0)
+#define DRM_MODE_IET_MULTIPLICATIVE			(1 << 1)
+
 static double ghe_calculate_filter_coefficient(struct globalhist_context *ghecontext);
 
 /*
@@ -37,19 +40,19 @@ static void ghe_initialize_temporal_filter_params(struct globalhist_context *ghe
 			ghecontext->filterparams.min_cut_off_freq_in_milli_hz);
 	ghecontext->filterparams.minimum_step_percent = GLOBALHIST_SMOOTHENING_TOLERANCE_DEFAULT;
 
-	for (uint8_t ietbinindex = 0; ietbinindex < GLOBALHIST_IET_LUT_LENGTH; ietbinindex++) {
+	for (uint8_t ietbinindex = 0; ietbinindex < ghecontext->ietlutentries; ietbinindex++) {
 		for (uint8_t filterorder = 0; filterorder < GLOBALHIST_IIR_FILTER_ORDER;
 								filterorder++)
 			ghecontext->filterparams.iethistory[ietbinindex][filterorder] =
 								GLOBALHIST_IET_SCALE_FACTOR;
 	}
 
-	for (uint8_t count = 0; count < GLOBALHIST_IET_LUT_LENGTH; count++)
+	for (uint8_t count = 0; count < ghecontext->ietlutentries; count++)
 		ghecontext->imageenhancement.luttarget[count] = GLOBALHIST_IET_SCALE_FACTOR;
 }
 
-static double ghe_estimate_probability_Of_full_screen_solidcolor(double *powerhistogram,
-				double totalpower)
+static double ghe_estimate_probability_Of_full_screen_solidcolor(struct globalhist_context *ghecontext,
+		double *powerhistogram, double totalpower)
 {
 	const double solidcolorpowerthreshold = SOLID_COLOR_POWER_THRESHOLD * totalpower;
 	double windowsizetoprobabilitymapping[SOLID_COLOR_SEARCH_WINDOW_SIZE] = {1, 1, 0.75, 0.375};
@@ -68,7 +71,7 @@ static double ghe_estimate_probability_Of_full_screen_solidcolor(double *powerhi
 	 * Return value is gradullay reduced to 0 for N >= 3.
 	 */
 	for (n = 1; n <= SOLID_COLOR_SEARCH_WINDOW_SIZE; n++) {
-		for (uint8_t binindex = 0; binindex < (GLOBALHIST_BIN_COUNT - n + 1); binindex++) {
+		for (uint8_t binindex = 0; binindex < (ghecontext->binscount- n + 1); binindex++) {
 			double sumpower = 0;
 
 			for (uint8_t i = binindex; i < (binindex + n); i++) {
@@ -108,13 +111,13 @@ static void ghe_set_diet_reg(struct globalhist_context *ghecontext,
 	gheargs->pipeid = ghecontext->pipe;
 	gheargs->isprogramdiet = true;
 
-	for (uint8_t count = 0; count < GLOBALHIST_IET_LUT_LENGTH; count++)
+	for (uint8_t count = 0; count < ghecontext->ietlutentries; count++)
 		gheargs->dietfactor[count] = ghecontext->imageenhancement.lutapplied[count];
 }
 
 static void ghe_reset_algorithm(struct globalhist_context *ghecontext)
 {
-	for (uint8_t count = 0; count < GLOBALHIST_IET_LUT_LENGTH; count++) {
+	for (uint8_t count = 0; count < ghecontext->ietlutentries; count++) {
 		ghecontext->imageenhancement.lutapplied[count] = GLOBALHIST_IET_SCALE_FACTOR;
 		for (uint8_t filterorder = 0; filterorder < GLOBALHIST_IIR_FILTER_ORDER;
 								filterorder++)
@@ -133,7 +136,7 @@ static bool ghe_is_target_iet_reached(struct globalhist_context *ghecontext)
 
 	maxacceptabledelta = ghecontext->filterparams.minimum_step_percent / 100.0;
 
-	for (uint32_t i = 0; i < GLOBALHIST_IET_LUT_LENGTH; i++) {
+	for (uint32_t i = 0; i < ghecontext->ietlutentries; i++) {
 		ietdelta = ((double)ghecontext->imageenhancement.lutapplied[i] -
 			       (double)ghecontext->imageenhancement.luttarget[i])
 				/ (double)ghecontext->imageenhancement.luttarget[i];
@@ -159,13 +162,13 @@ static double ghe_pcphase_coordinator_temporal_filter_Nthorder(double filtercoef
 }
 
 static void ghe_temporal_smoothen_iet(struct globalhist_context *ghecontext,
-				struct globalhist_args *gheargs)
+		struct globalhist_args *gheargs)
 {
 	double temporalfiltercoefficient;
 
 	if (ghe_is_target_iet_reached(ghecontext) == false) {
 		temporalfiltercoefficient = ghe_calculate_filter_coefficient(ghecontext);
-		for (uint8_t count = 0; count < GLOBALHIST_IET_LUT_LENGTH; count++) {
+		for (uint8_t count = 0; count < ghecontext->ietlutentries; count++) {
 			double ietval = ghe_pcphase_coordinator_temporal_filter_Nthorder(
 						temporalfiltercoefficient,
 						ghecontext->imageenhancement.luttarget[count],
@@ -175,19 +178,16 @@ static void ghe_temporal_smoothen_iet(struct globalhist_context *ghecontext,
 			ghecontext->imageenhancement.lutapplied[count] = ietval;
 		}
 	} else {
-		memcpy(ghecontext->imageenhancement.lutapplied,
-			ghecontext->imageenhancement.luttarget,
-			sizeof(ghecontext->imageenhancement.luttarget));
-		for (uint8_t count = 0; count < GLOBALHIST_IET_LUT_LENGTH; count++) {
+		*(ghecontext->imageenhancement.lutapplied) = 
+			*(ghecontext->imageenhancement.luttarget);
+		for (uint8_t count = 0; count < ghecontext->ietlutentries; count++) {
 			for (uint8_t HistoryIndex = 0; HistoryIndex < GLOBALHIST_IIR_FILTER_ORDER;
 									HistoryIndex++)
 				ghecontext->filterparams.iethistory[count][HistoryIndex] =
 					ghecontext->imageenhancement.luttarget[count];
 		}
 	}
-	memcpy(ghecontext->filterparams.prevhistogram, ghecontext->histogram,
-			sizeof(ghecontext->filterparams.prevhistogram));
-
+	*(ghecontext->filterparams.prevhistogram) = *(ghecontext->histogram);
 }
 
 static double ghe_get_relative_frame_brightness_change(struct globalhist_context *ghecontext,
@@ -197,7 +197,7 @@ static double ghe_get_relative_frame_brightness_change(struct globalhist_context
 	double frameaveragepowercurr = 0;
 	double histchangepercentage = 0;
 
-	for (uint32_t count = 0; count < GLOBALHIST_BIN_COUNT; count++) {
+	for (uint32_t count = 0; count < ghecontext->binscount; count++) {
 		frameaveragepowerprev += ghecontext->degammalut[count] * (double)prevhist[count];
 		frameaveragepowercurr += ghecontext->degammalut[count] *
 			(double)ghecontext->histogram[count];
@@ -243,47 +243,47 @@ static void ghe_algorithm(struct globalhist_context *ghecontext,
 {
 	uint32_t totalnumofpixel = 0;
 	uint32_t *multiplierlut = ghecontext->imageenhancement.luttarget;
-	double enhancementtable[GLOBALHIST_BIN_COUNT];
-	double filtered_enhancement_table[GLOBALHIST_BIN_COUNT];
+	double enhancementtable[ghecontext->binscount];
+	double filtered_enhancement_table[ghecontext->binscount];
 	double binindexnormalized, ietval;
 	double cdfrange, cdfnormalizingfactor;
 	double probability_of_full_screen_solid_color;
 	double sumpower = 0; /* Total Power of input frame */
 	/* Histogram bin wise distribution of power */
-	double powerdistribution[GLOBALHIST_BIN_COUNT];
-	const double maxhistbinindex = GLOBALHIST_MAX_BIN_INDEX;
-	const double ietlutstepsize = 1.0 / (double)GLOBALHIST_MAX_IET_INDEX;
+	double powerdistribution[ghecontext->binscount];
+	const double maxhistbinindex = ghecontext->binscount -1;
+	const double ietlutstepsize = 1.0 / (double)(ghecontext->ietlutentries -1);
 	const double histbinstepsize = 1.0 / maxhistbinindex;
 	const double maxslope = 7.0;
 	const double minslope = 0.3;
 
-	for (uint8_t binindex = 0; binindex < GLOBALHIST_BIN_COUNT; binindex++) {
+	for (uint8_t binindex = 0; binindex < ghecontext->binscount; binindex++) {
 		totalnumofpixel += ghecontext->histogram[binindex];
 		enhancementtable[binindex] = totalnumofpixel;
 	}
 	ghecontext->algorithm.imagesize = totalnumofpixel;
 
 	/* Calculate histogram bin wise power distribution and total frame power */
-	for (uint8_t binindex = 0; binindex < GLOBALHIST_BIN_COUNT; binindex++) {
+	for (uint8_t binindex = 0; binindex < ghecontext->binscount; binindex++) {
 		double binweight = ghecontext->degammalut[binindex];
 
 		powerdistribution[binindex] = binweight * (double)ghecontext->histogram[binindex];
 		sumpower += powerdistribution[binindex];
 	}
 	probability_of_full_screen_solid_color =
-		ghe_estimate_probability_Of_full_screen_solidcolor(powerdistribution, sumpower);
+		ghe_estimate_probability_Of_full_screen_solidcolor(ghecontext, powerdistribution, sumpower);
 
 	/* Do not modify pixel values for Solid Color */
 	if (probability_of_full_screen_solid_color == 1) {
-		for (uint8_t binindex = 0; binindex < GLOBALHIST_IET_LUT_LENGTH; binindex++)
+		for (uint8_t binindex = 0; binindex < ghecontext->ietlutentries; binindex++)
 			multiplierlut[binindex] = GLOBALHIST_IET_SCALE_FACTOR;
 	}
 
-	cdfrange = enhancementtable[GLOBALHIST_BIN_COUNT - 1] - ghecontext->histogram[0];
+	cdfrange = enhancementtable[ghecontext->binscount - 1] - ghecontext->histogram[0];
 	cdfnormalizingfactor = 1.0 / cdfrange;
 	enhancementtable[0] = (double)(enhancementtable[0] - ghecontext->histogram[0])
 				* cdfnormalizingfactor;
-	for (uint8_t binindex = 1; binindex < GLOBALHIST_BIN_COUNT; binindex++) {
+	for (uint8_t binindex = 1; binindex < ghecontext->binscount; binindex++) {
 		double outval = (enhancementtable[binindex] - ghecontext->histogram[0])
 					* cdfnormalizingfactor;
 		double prevsampleval = enhancementtable[binindex - 1];
@@ -298,18 +298,18 @@ static void ghe_algorithm(struct globalhist_context *ghecontext,
 
 	/* No filtering for 0th and last values of the IET. */
 	filtered_enhancement_table[0] = enhancementtable[0];
-	filtered_enhancement_table[GLOBALHIST_MAX_BIN_INDEX] =
-		enhancementtable[GLOBALHIST_MAX_BIN_INDEX];
+	filtered_enhancement_table[ghecontext->binscount] =
+		enhancementtable[ghecontext->binscount];
 
 	/* Smoothen jerks in FilteredEnhancementTable by averaging with nearby bins. */
-	for (uint8_t binindex = 1; binindex < GLOBALHIST_MAX_BIN_INDEX; binindex++) {
+	for (uint8_t binindex = 1; binindex < ghecontext->binscount -1; binindex++) {
 		/* Average out current and two nearby sampels.*/
 		filtered_enhancement_table[binindex] = 0.333333 * (enhancementtable[binindex - 1] +
 			enhancementtable[binindex] + enhancementtable[binindex + 1]);
 	}
 
 	/* Convert LUT of size GlobalHist_BIN_COUNT to IET LUT of size GLOBALHIST_IET_LUT_LENGTH */
-	for (uint32_t binindex = 1; binindex < GLOBALHIST_IET_LUT_LENGTH; binindex++) {
+	for (uint32_t binindex = 1; binindex < ghecontext->ietlutentries; binindex++) {
 		binindexnormalized = (double)binindex * ietlutstepsize;
 		ietval = ghe_apply_1dlut(binindexnormalized, filtered_enhancement_table,
 						maxhistbinindex);
@@ -327,7 +327,7 @@ static void ghe_algorithm(struct globalhist_context *ghecontext,
 	multiplierlut[0] = multiplierlut[1];
 	ghe_temporal_smoothen_iet(ghecontext, gheargs);
 	memcpy(ghecontext->filterparams.prevhistogram, ghecontext->histogram,
-				sizeof(ghecontext->histogram));
+				sizeof(ghecontext->binscount));
 }
 
 static void ghe_initialize_algorithm(struct globalhist_context *ghecontext,
@@ -344,8 +344,8 @@ static void ghe_initialize_algorithm(struct globalhist_context *ghecontext,
 	/* Reset GlobalHist data structures */
 	ghecontext->ghefunctable.gheresetalgorithm(ghecontext);
 	ghe_initialize_temporal_filter_params(ghecontext);
-	hist_lut_step_size = 1.0 / (double)GLOBALHIST_MAX_BIN_INDEX;
-	for (uint8_t binindex = 0; binindex < GLOBALHIST_MAX_BIN_INDEX; binindex++)
+	hist_lut_step_size = 1.0 / (double)(ghecontext->binscount -1);
+	for (uint8_t binindex = 0; binindex < ghecontext->binscount-1; binindex++)
 		ghecontext->degammalut[binindex] =
 			ghe_get_srgb_decoding_value((double)binindex * hist_lut_step_size);
 
@@ -358,12 +358,17 @@ static void ghe_initialize_algorithm(struct globalhist_context *ghecontext,
 
 void histogram_compute_generate_data_bin(struct globalhist_args *gheargs)
 {
+	if (gheargs->histogrammode != DRM_MODE_HISTOGRAM_HSV_MAX_RGB)
+		return;
+
 	struct globalhist_context *ghecontext =
 		(struct globalhist_context *)malloc(sizeof(struct globalhist_context));
 
 	assert(ghecontext != NULL);
 
-	memcpy(ghecontext->histogram, gheargs->histogram, GLOBALHIST_BIN_COUNT * sizeof(uint32_t));
+	ghecontext->histogram = gheargs->histogram;
 	ghecontext->algorithm.imagesize = (gheargs->resolution_x * gheargs->resolution_y);
 	ghe_initialize_algorithm(ghecontext, gheargs);
+	gheargs->ietmode = DRM_MODE_IET_MULTIPLICATIVE;
+	ghecontext->degammalut = (double *)malloc(ghecontext->binscount * sizeof(uint32_t));
 }
