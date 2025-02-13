@@ -1,0 +1,100 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+DD_ABS	ghe_algorithm.h	25;"	d
+DD_DIFF	ghe_algorithm.h	26;"	d
+DD_MAX	ghe_algorithm.h	22;"	d
+DD_MIN	ghe_algorithm.h	23;"	d
+DD_ROUNDTONEARESTINT	ghe_algorithm.h	24;"	d
+DRM_MODE_HISTOGRAM_HSV_MAX_RGB	ghe_algorithm.c	8;"	d	file:
+DRM_MODE_IET_MULTIPLICATIVE	ghe_algorithm.c	9;"	d	file:
+GHE_ALGORITHM_H_	ghe_algorithm.h	7;"	d
+GHE_H_	ghe.h	7;"	d
+GLOBALHIST_DEFAULT_BOOST	ghe_algorithm.h	27;"	d
+GLOBALHIST_IET_MAX_VAL	ghe_algorithm.h	32;"	d
+GLOBALHIST_IET_SCALE_FACTOR	ghe_algorithm.h	29;"	d
+GLOBALHIST_IIR_FILTER_ORDER	ghe_algorithm.h	31;"	d
+GLOBALHIST_SMOOTHENING_MAX_SPEED_DEFAULT	ghe_algorithm.h	38;"	d
+GLOBALHIST_SMOOTHENING_MIN_SPEED_DEFAULT	ghe_algorithm.h	36;"	d
+GLOBALHIST_SMOOTHENING_PERIOD_DEFAULT	ghe_algorithm.h	39;"	d
+GLOBALHIST_SMOOTHENING_TOLERANCE_DEFAULT	ghe_algorithm.h	41;"	d
+GlobalHist_PIPE_A	ghe.h	/^	GlobalHist_PIPE_A = 0,$/;"	e	enum:pipe_id
+GlobalHist_PIPE_B	ghe.h	/^	GlobalHist_PIPE_B = 1,$/;"	e	enum:pipe_id
+GlobalHist_PIPE_C	ghe.h	/^	GlobalHist_PIPE_C = 2,$/;"	e	enum:pipe_id
+GlobalHist_PIPE_D	ghe.h	/^	GlobalHist_PIPE_D = 3$/;"	e	enum:pipe_id
+IN	ghe_algorithm.h	19;"	d
+MILLIUNIT_TO_UNIT	ghe_algorithm.h	30;"	d
+PHASE_GLOBALHIST_PERIOD	ghe_algorithm.h	34;"	d
+SMOOTHENING_MIN_STABLE_CUT_OFF_FREQUNCY_DURATION	ghe_algorithm.h	33;"	d
+SOLID_COLOR_POWER_THRESHOLD	ghe_algorithm.h	43;"	d
+SOLID_COLOR_SEARCH_WINDOW_SIZE	ghe_algorithm.h	44;"	d
+algorithm	ghe_algorithm.h	/^	struct globalhist_algorithm algorithm;$/;"	m	struct:globalhist_context	typeref:struct:globalhist_context::globalhist_algorithm
+binscount	ghe.h	/^	uint32_t binscount;$/;"	m	struct:globalhist_args
+binscount	ghe_algorithm.h	/^        uint32_t binscount;$/;"	m	struct:globalhist_context
+current_max_cut_off_freq_in_milli_hz	ghe_algorithm.h	/^	uint32_t current_max_cut_off_freq_in_milli_hz;$/;"	m	struct:globalhist_temporal_filter_params
+current_min_cut_off_freq_in_milli_hz	ghe_algorithm.h	/^	uint32_t current_min_cut_off_freq_in_milli_hz;$/;"	m	struct:globalhist_temporal_filter_params
+degammalut	ghe_algorithm.h	/^	double *degammalut;$/;"	m	struct:globalhist_context
+dietfactor	ghe.h	/^	uint64_t *dietfactor;$/;"	m	struct:globalhist_args
+dietfactor	ghe_algorithm.h	/^        uint64_t *dietfactor;$/;"	m	struct:globalhist_context
+filterparams	ghe_algorithm.h	/^	struct globalhist_temporal_filter_params filterparams;$/;"	m	struct:globalhist_context	typeref:struct:globalhist_context::globalhist_temporal_filter_params
+ghe_algorithm	ghe_algorithm.c	/^static void ghe_algorithm(struct globalhist_context *ghecontext,$/;"	f	file:
+ghe_apply_1dlut	ghe_algorithm.c	/^static double ghe_apply_1dlut(double inval, double *lut, double maxindex)$/;"	f	file:
+ghe_calculate_filter_coefficient	ghe_algorithm.c	/^static double ghe_calculate_filter_coefficient(struct globalhist_context *ghecontext)$/;"	f	file:
+ghe_estimate_probability_Of_full_screen_solidcolor	ghe_algorithm.c	/^static double ghe_estimate_probability_Of_full_screen_solidcolor(struct globalhist_context *ghecontext,$/;"	f	file:
+ghe_get_relative_frame_brightness_change	ghe_algorithm.c	/^static double ghe_get_relative_frame_brightness_change(struct globalhist_context *ghecontext,$/;"	f	file:
+ghe_get_srgb_decoding_value	ghe_algorithm.c	/^static double ghe_get_srgb_decoding_value(double input)$/;"	f	file:
+ghe_initialize_algorithm	ghe_algorithm.c	/^static void ghe_initialize_algorithm(struct globalhist_context *ghecontext,$/;"	f	file:
+ghe_initialize_temporal_filter_params	ghe_algorithm.c	/^static void ghe_initialize_temporal_filter_params(struct globalhist_context *ghecontext)$/;"	f	file:
+ghe_is_target_iet_reached	ghe_algorithm.c	/^static bool ghe_is_target_iet_reached(struct globalhist_context *ghecontext)$/;"	f	file:
+ghe_pcphase_coordinator_temporal_filter_Nthorder	ghe_algorithm.c	/^static double ghe_pcphase_coordinator_temporal_filter_Nthorder(double filtercoefficient,$/;"	f	file:
+ghe_reset_algorithm	ghe_algorithm.c	/^static void ghe_reset_algorithm(struct globalhist_context *ghecontext)$/;"	f	file:
+ghe_set_diet_reg	ghe_algorithm.c	/^static void ghe_set_diet_reg(struct globalhist_context *ghecontext,$/;"	f	file:
+ghe_temporal_smoothen_iet	ghe_algorithm.c	/^static void ghe_temporal_smoothen_iet(struct globalhist_context *ghecontext,$/;"	f	file:
+ghealgorithm	ghe_algorithm.h	/^	globalhistalgorithm ghealgorithm;$/;"	m	struct:globalhist_functbl
+ghefunctable	ghe_algorithm.h	/^	struct globalhist_functbl ghefunctable;      \/\/ GlobalHist Algorithm Function Table$/;"	m	struct:globalhist_context	typeref:struct:globalhist_context::globalhist_functbl
+gheresetalgorithm	ghe_algorithm.h	/^	globalhistresetalgorithm gheresetalgorithm;$/;"	m	struct:globalhist_functbl
+ghesetiet	ghe_algorithm.h	/^	globalhistprogramietregisters ghesetiet;$/;"	m	struct:globalhist_functbl
+globalhist_algorithm	ghe_algorithm.h	/^struct globalhist_algorithm {$/;"	s
+globalhist_args	ghe.h	/^struct globalhist_args {$/;"	s
+globalhist_context	ghe_algorithm.h	/^struct globalhist_context {$/;"	s
+globalhist_functbl	ghe_algorithm.h	/^struct globalhist_functbl {$/;"	s
+globalhist_ie	ghe_algorithm.h	/^struct globalhist_ie {$/;"	s
+globalhist_temporal_filter_params	ghe_algorithm.h	/^struct globalhist_temporal_filter_params {$/;"	s
+globalhistalgorithm	ghe_algorithm.h	/^typedef void (*globalhistalgorithm)(IN void *, struct globalhist_args *gheargs);$/;"	t
+globalhistprogramietregisters	ghe_algorithm.h	/^typedef void (*globalhistprogramietregisters)(IN void *, struct globalhist_args *gheargs);$/;"	t
+globalhistresetalgorithm	ghe_algorithm.h	/^typedef void (*globalhistresetalgorithm)(IN void *);$/;"	t
+histogram	ghe.h	/^	uint64_t *histogram;$/;"	m	struct:globalhist_args
+histogram	ghe_algorithm.h	/^        uint64_t *histogram;$/;"	m	struct:globalhist_context
+histogram_compute_generate_data_bin	ghe_algorithm.c	/^void histogram_compute_generate_data_bin(struct globalhist_args *gheargs)$/;"	f
+histogrammode	ghe.h	/^	uint8_t histogrammode;$/;"	m	struct:globalhist_args
+histogrammode	ghe_algorithm.h	/^	 uint8_t histogrammode;$/;"	m	struct:globalhist_context
+iethistory	ghe_algorithm.h	/^	double **iethistory;$/;"	m	struct:globalhist_temporal_filter_params
+ietlutentries	ghe.h	/^	uint32_t ietlutentries;$/;"	m	struct:globalhist_args
+ietlutentries	ghe_algorithm.h	/^        uint32_t ietlutentries;$/;"	m	struct:globalhist_context
+ietmode	ghe.h	/^	uint8_t ietmode;$/;"	m	struct:globalhist_args
+ietmode	ghe_algorithm.h	/^        uint8_t ietmode;$/;"	m	struct:globalhist_context
+imageenhancement	ghe_algorithm.h	/^	struct globalhist_ie imageenhancement;$/;"	m	struct:globalhist_context	typeref:struct:globalhist_context::globalhist_ie
+imagesize	ghe_algorithm.h	/^	uint32_t imagesize;$/;"	m	struct:globalhist_algorithm
+isprogramdiet	ghe.h	/^	bool isprogramdiet;$/;"	m	struct:globalhist_args
+lut	ghe_algorithm.h	/^	uint32_t *lut;$/;"	m	struct:globalhist_context
+lut_data	test.c	/^uint64_t lut_data[32] = {45, 65, 78, 34, 67, 22, 52, 99, 77, 43, 81, 90, 30, 70, 98, 60,$/;"	v
+lutapplied	ghe_algorithm.h	/^	uint32_t *lutapplied;$/;"	m	struct:globalhist_ie
+lutdelta	ghe_algorithm.h	/^	uint32_t *lutdelta;$/;"	m	struct:globalhist_ie
+luttarget	ghe_algorithm.h	/^	uint32_t *luttarget;$/;"	m	struct:globalhist_ie
+main	build/meson-private/sanitycheckc.c	/^int main(void) { int class=0; return class; }$/;"	f
+main	test.c	/^int main()$/;"	f
+max_cut_off_freq_in_milli_hz	ghe_algorithm.h	/^	uint32_t max_cut_off_freq_in_milli_hz; \/\/ Value from the INF or Default$/;"	m	struct:globalhist_temporal_filter_params
+min_cut_off_freq_in_milli_hz	ghe_algorithm.h	/^	uint32_t min_cut_off_freq_in_milli_hz; \/\/ Value from the INF or Default$/;"	m	struct:globalhist_temporal_filter_params
+minimum_step_percent	ghe_algorithm.h	/^	double minimum_step_percent;$/;"	m	struct:globalhist_temporal_filter_params
+pipe	ghe_algorithm.h	/^	enum pipe_id pipe;$/;"	m	struct:globalhist_context	typeref:enum:globalhist_context::pipe_id
+pipe_id	ghe.h	/^enum pipe_id {$/;"	g
+pipeid	ghe.h	/^	enum pipe_id pipeid;$/;"	m	struct:globalhist_args	typeref:enum:globalhist_args::pipe_id
+prevhistogram	ghe_algorithm.h	/^	uint32_t *prevhistogram;$/;"	m	struct:globalhist_temporal_filter_params
+resolution_x	ghe.h	/^	uint32_t resolution_x;$/;"	m	struct:globalhist_args
+resolution_y	ghe.h	/^	uint32_t resolution_y;$/;"	m	struct:globalhist_args
+smootheningiteration	ghe_algorithm.h	/^	uint64_t smootheningiteration;$/;"	m	struct:globalhist_temporal_filter_params
+targetboost	ghe_algorithm.h	/^	double targetboost;$/;"	m	struct:globalhist_temporal_filter_params
+user	test.c	/^struct globalhist_args user;$/;"	v	typeref:struct:globalhist_args

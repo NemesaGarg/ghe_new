@@ -9,13 +9,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <math.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-
-#define GLOBALHIST_BIN_COUNT 32   // Total number of segments in GlobalHist
-#define GLOBALHIST_IET_LUT_LENGTH 33 // Total number of IET entries
 
 enum pipe_id {
 	GlobalHist_PIPE_A = 0,
@@ -27,8 +23,12 @@ enum pipe_id {
 struct globalhist_args {
 	enum pipe_id pipeid;
 	bool isprogramdiet;
-	uint32_t dietfactor[GLOBALHIST_IET_LUT_LENGTH];
-	uint32_t histogram[GLOBALHIST_BIN_COUNT];
+	uint8_t histogrammode;
+	uint32_t binscount;
+	uint8_t ietmode;
+	uint32_t ietlutentries;
+	uint64_t *dietfactor;
+	uint64_t *histogram;
 	uint32_t resolution_x;
 	uint32_t resolution_y;
 };
